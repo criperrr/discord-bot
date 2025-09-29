@@ -7,7 +7,7 @@ if [ "$LOG_FILES" -gt 0 ]; then
 fi
 
 # Mata qualquer processo do usuario que possa ser o bot (pro servidor da escola, isso serve)
-PROCESS=$(ps u | awk '/node/ && !/awk/{print $2}') # todos os processos do usuario -> pega so as linhas con 'node' -> remove o grep e pga a seguna coluna (pid)
+PROCESS=$(ps u | awk '/eq5ini2a/ && /node/ && !/awk/{print $2}') # todos os processos do usuario -> pega so as linhas con 'node' -> remove o grep e pga a seguna coluna (pid)
 
 
 if [ -n "$PROCESS" ]; then

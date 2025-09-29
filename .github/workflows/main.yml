@@ -13,5 +13,4 @@ jobs:
         password: ${{ secrets.PASSWORD }}
         port: ${{ secrets.SERVER_PORT }}
         script: |
-          cd ~/dicord-gemini-bot && git pull && bash start.sh
-        
+          cd ~/discord-bot && bash start.sh
