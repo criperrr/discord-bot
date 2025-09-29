@@ -76,15 +76,12 @@ async function getGrades(logToken, ano) {
         }
     }
 
-    const globalGradesPath = `${usersHome}/globalGrades.json`
-    const globalGradesSJson = JSON.stringify({ grades: grades, hashes: hashes }, null, 2);
 
-    fs.writeFileSync(globalGradesPath, globalGradesSJson);
 
     return {
         generalGrades: grades,
         gradesLenght: titles.length,
-        generalHases: hashes,
+        generalHashes: hashes,
         userGrades: finalUserGrades,
         userCurrentYear: userCurrentYear,
     }

@@ -1,6 +1,7 @@
 require('dotenv').config();
-const login =  require('./utils/login.js')
-const getGrades = require('./utils/getGrades.js')
+const login =  require('./utils/login.js');
+const getGrades = require('./utils/getGrades.js');
+const checkNewGrades = require('./utils/checkNewGrades.js');
 
 const token = process.env.TOKEN;
 const { Client, Collection, Events, GatewayIntentBits, MessageFlags } = require('discord.js');
@@ -14,11 +15,10 @@ const channel_id = process.env.SERVER_IE_CHANNEL_ID;
 client.commands = new Collection(); 
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath); // Read folders in ./commands/
-const usersHome = path.join(__dirname, 'users')
-
+const usersHome = path.join(__dirname, 'users');
 
 if(!fs.existsSync(usersHome)){
-    fs.mkdirSync(usersHome) // Ensure that users folder is created to use it in other scripts
+    fs.mkdirSync(usersHome); // Ensure that users folder is created to use it in other scripts
 }
 
 for (const folder of commandFolders) {
@@ -38,12 +38,8 @@ for (const folder of commandFolders) {
 client.on('ready', async () => {
 	console.log(`Ready! Logged in as ${client.user.tag}`);
     if(process.env.NSACEMAIL){
-        console.log("Login into nsac and getting class grades...");
-        const logToken = await login(process.env.NSACEMAIL, process.env.NSACPASS);
-        await getGrades(logToken)
-        console.log("Initial class grade hashes were saved locally");
+        initializeGradeChecker(client, usersHome); 
     }
-    const guild_debug = client.guilds.cache.get(client);
     const channel_debug = client.channels.cache.get(channel_id);    
     const date = new Date();
     const time = date.toLocaleDateString('pt-BR');
@@ -54,6 +50,23 @@ client.on('ready', async () => {
 
     await channel_debug.send(`I'm alive :D\nStart time: ${time}, ${hours}:${minutes}:${seconds}:${milliseconds}`);
 });
+
+async function initializeGradeChecker(client, usersHome) {
+    const fsPromises = require('node:fs').promises;
+
+    console.log("Login into nsac and getting class grades...");
+
+    const logToken = await login(process.env.NSACEMAIL, process.env.NSACPASS);
+    const grades = await getGrades(logToken);
+
+    const globalGradesPath = `${usersHome}/globalGrades.json`
+    const globalGradesSJson = JSON.stringify({ grades: grades.generalGrades, hashes: grades.generalHashes }, null, 2);
+
+    await fsPromises.writeFile(globalGradesPath, globalGradesSJson);
+
+    const checkNewGradesInterval = setInterval(() => checkNewGrades(client), (60*60*1000));
+    console.log("Initial class grade hashes were saved locally");
+}
 
 client.on(Events.InteractionCreate, async interaction => {
     if (!interaction.isChatInputCommand()) return;
@@ -78,8 +91,4 @@ client.on(Events.InteractionCreate, async interaction => {
 })
 
 
-
 client.login(token);
-
-
-
