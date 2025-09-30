@@ -146,11 +146,17 @@ module.exports = {
                 const result = await chatSession.sendMessage({
                     message: userInput,
                 });
-                const response = result.text;
+                const response = result.text + "";
 
                 const limit = 1999;
 
+                if(response.length <= limit){
+                    await interaction.followUp(response);
+                    return
+                }
+
                 const parts = [];
+                
                 for (let i = 0; i < response.length; i += limit) {
                     parts.push(response.substring(i, Math.min(i + limit, response.length)));
                 }
