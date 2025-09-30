@@ -56,7 +56,7 @@ async function checkNewGrades(client) {
     if (differentGrades.length > 0) {
         const globalGradesSJson = JSON.stringify({ grades: grades.generalGrades, hashes: grades.generalHashes }, null, 2);
         fs.writeFileSync(globalGradesPath, globalGradesSJson);
-        await gradesChannel.send('Novas notas!', {
+        await gradesChannel.send('📢 **NOVAS NOTAS NO NSAC!** 🔔 @everyone', {
             allowedMentions: {
                 parse: ['everyone']
             }
