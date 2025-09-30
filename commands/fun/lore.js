@@ -53,7 +53,7 @@ module.exports = {
             const text = result.text;
 
             if (text.length <= limit) {
-                await interaction.followUp(text);
+                await interaction.editReply(text);
                 return;
             }
             // Breaks text in different parts to fit in discord limitation

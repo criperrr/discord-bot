@@ -78,7 +78,7 @@ module.exports = {
             const limit = 1999;
 
             if (response.length <= limit) {
-                await interaction.followUp(response);
+                await interaction.editReply(response);
                 return
             }
 

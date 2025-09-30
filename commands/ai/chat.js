@@ -152,11 +152,9 @@ module.exports = {
 
                 if(response.length <= limit){
                     await interaction.followUp(response);
-                    return
                 }
 
                 const parts = [];
-                
                 for (let i = 0; i < response.length; i += limit) {
                     parts.push(response.substring(i, Math.min(i + limit, response.length)));
                 }
