@@ -2,8 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const login = require('./login.js');
 const getGrades = require('./getGrades.js');
-const { Client, PermissionsBitField, AllowedMentionsTypes } = require('discord.js');
-const { channel } = require('diagnostics_channel');
+const { Client } = require('discord.js');
+
 require('dotenv').config
 
 /**@param {Client} client  */
@@ -84,7 +84,7 @@ async function checkNewGrades(client) {
                     console.log("classGrade:" + classGrade);
 
 
-                    message += `🎯 **Sua Nota Atual (Bim. ${lastGradeIndex + 1}):** **__${newGrade}__**\n\n`;
+                    
                     let evolutionMessage = '';
                     if (lastGrade !== null && lastGrade > 0) { // só calcula se houver uma nota anterior e ela for maior que zero
                         const evolution = ((newGrade - lastGrade) / lastGrade) * 100;
@@ -95,6 +95,7 @@ async function checkNewGrades(client) {
                     } 
 
                     message += `\n**--- ${g.name} ---**\n`;
+                    message += `🎯 **Sua Nota Atual (Bim. ${lastGradeIndex + 1}):** **__${newGrade}__**\n\n`;
                     message += `📊 **Média da Turma (Bim. ${lastGradeIndex + 1}):** __${classGrade}__\n`;
                     if (lastGrade) {
                         message += `⭐ **Sua Média Bimestral Anterior:** __${lastGrade}__\n`;

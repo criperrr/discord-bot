@@ -131,6 +131,10 @@ module.exports = {
                         temperature: temperature,
                         topP: topP,
                         topK: topK,
+                        tools: [
+                            { urlContext: {} },
+                            { googleSearch: {} }
+                        ],
                     }
 
                 });
@@ -150,7 +154,7 @@ module.exports = {
 
                 const limit = 1999;
 
-                if(response.length <= limit){
+                if (response.length <= limit) {
                     await interaction.followUp(response);
                 }
 
