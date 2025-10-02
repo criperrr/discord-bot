@@ -36,15 +36,18 @@ async function login(email, pass, userId) {
             "method": "GET",
             "redirect": "manual"
         }); // test if server let me log in with these cookies
-        
+
         console.log(responseTest);
-        
+
         if (responseTest.status == 200) {
             return cookieString;
-        } else return false;
+        } else {
+            console.log("Error while login in. Reponse status: " + responseTest.status)
+        }
+
     }
 
-    if(!email || !pass) return false;
+    if (!email || !pass) return false;
 
     const cookies = await getTokens()
 
