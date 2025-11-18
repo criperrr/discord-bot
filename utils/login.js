@@ -62,7 +62,6 @@ async function login(email, pass, userId) {
     const authString = `_token=${hiddenToken}&email=${emailEncoded}&password=${passEncoded}`
 
     // console.log(authString);
-
     const responseLogin = await fetch("http://200.145.153.1/nsac/login", {
         "credentials": "include",
         "headers": {
@@ -70,7 +69,7 @@ async function login(email, pass, userId) {
             "Referer": "http://200.145.153.1/nsac/",
             "Cookie": cookiesString
         },
-        "body": authString,
+        "body": `${authString}&remember=on`,
         "method": "POST",
         "redirect": "manual"
     });
@@ -78,7 +77,8 @@ async function login(email, pass, userId) {
     const newCookies = responseLogin.headers.getSetCookie();
     xsrf = newCookies[0].split(';')[0];
     nsaconline = newCookies[1].split(';')[0];
-    const newCookiesString = `${xsrf}; ${nsaconline}`;
+    const rememberCookie = newCookies[2].split(';')[0];
+    const newCookiesString = `${xsrf}; ${nsaconline}; ${rememberCookie}`;
 
 
     const responseTest = await fetch("http://200.145.153.1/nsac/home", {
