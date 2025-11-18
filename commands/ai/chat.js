@@ -47,7 +47,7 @@ module.exports = {
 
     /**@param {CommandInteraction} interaction  */
     async execute(interaction) {
-        const currentSessionId = `${interaction.user.id}-${interaction.channel.id}`;
+        const currentSessionId = `${interaction.user.id}-${interaction.channel?.id}`;
         console.log(currentSessionId);
 
         const subcommand = interaction.options.getSubcommand();
@@ -107,9 +107,7 @@ module.exports = {
                                  Timestamps 
                                     - Timestamp desta Mensagem  ${sentTimestamp ?? 'é uma dm ou valor é null'} 
                                     - Criação da Conta (Timestamp)  ${interaction.user?.createdTimestamp ?? 'é uma dm ou valor é null'}
-                                    - Quando entrei no servidor: ${interaction.member?.joinedTimestamp ?? 'é uma dm ou valor é null'} 
-                                    
-                            Esse é o input da mensagem de resposta única: ${message}`
+                                    - Quando entrei no servidor: ${interaction.member?.joinedTimestamp ?? 'é uma dm ou valor é null'} `
                             }],
                         },
                         {
@@ -153,10 +151,6 @@ module.exports = {
                 const response = result.text + "";
 
                 const limit = 1999;
-
-                if (response.length <= limit) {
-                    await interaction.followUp(response);
-                }
 
                 const parts = [];
                 for (let i = 0; i < response.length; i += limit) {

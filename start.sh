@@ -14,5 +14,10 @@ if [ -n "$PROCESS" ]; then
     kill "$PROCESS" # só mata se a variavel process n for vazia (se o processo ja estiver rodando)
 fi
 
+read -p "Digite o email padrão do NSAC (pode deixar vazio): " nsacemail
+read -s -p "Digite a senha do NSAC: " nsacpass
+
+export NSACPASS="$nsacpass" 
+export NSACEMAIL="$nsacemail"
 nohup node index.js >> "./logs/log.txt" 2>&1 &
 disown

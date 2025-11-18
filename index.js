@@ -64,7 +64,7 @@ async function initializeGradeChecker(client, usersHome) {
 
     await fsPromises.writeFile(globalGradesPath, globalGradesSJson);
 
-    const checkNewGradesInterval = setInterval(() => checkNewGrades(client), (60 * 60 * 1000));
+    const checkNewGradesInterval = setInterval(() => checkNewGrades(client), (15 * 15 * 1000));
     console.log("Initial class grade hashes were saved locally");
 }
 
