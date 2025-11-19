@@ -72,6 +72,7 @@ async function checkNewGrades(client) {
             console.log(grades);
             let message = `Olá, **${user.username}** :wave:! **Gemilão** aqui!\n\nEstou te avisando que __**saíram novas notas**__ no **NSAC**! :tada:\n\nConfira abaixo as suas notas atualizadas:`;
             if (grades) {
+		let evolutionMessage = '';
                 for (let i = 0; i < differentGrades.length; i++) {
                     const g = grades.userGrades[differentGrades[i]];
                     console.log(g)
@@ -83,9 +84,6 @@ async function checkNewGrades(client) {
                     const classGrade = grades.generalGrades[differentGrades[i]].grades[lastGradeIndex];
                     console.log("classGrade:" + classGrade);
 
-
-                    
-                    let evolutionMessage = '';
                     if (lastGrade !== null && lastGrade > 0) { // só calcula se houver uma nota anterior e ela for maior que zero
                         const evolution = ((newGrade - lastGrade) / lastGrade) * 100;
                         const evolutionSign = evolution >= 0 ? '🔺' : '🔻';

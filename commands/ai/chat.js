@@ -133,7 +133,7 @@ module.exports = {
                             { urlContext: {} },
                             { googleSearch: {} }
                         ],
-                        safetySettings: [
+                      safetySettings: [
                             {
                                 category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
                                 threshold: "OFF"
