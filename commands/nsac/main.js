@@ -36,8 +36,6 @@ module.exports = {
         })
         const logToken = personalGrade ? await login(null, null, interaction.user.id) : await login(process.env.NSACEMAIL, process.env.NSACPASS);
 
-        let aditionalMessage = '';
-
         if (logToken) {
             console.log('Logado com sucesso. Acessando boletim...');
             const grades = await getGrades(logToken, ano);
