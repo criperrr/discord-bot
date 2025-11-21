@@ -35,10 +35,10 @@ module.exports = {
             content: `_Certo, vou acessar o boletim do **${ano ? ano + ' ano' : 'seu ano atual'}**, **${bim} bimestre, aguarde o login...**_`,
         })
         const logToken = personalGrade ? await login(null, null, interaction.user.id) : await login(process.env.NSACEMAIL, process.env.NSACPASS);
-
+        console.log({logToken})
         if (logToken) {
             console.log('Logado com sucesso. Acessando boletim...');
-            const grades = await getGrades(logToken, ano);
+            const grades = await getGrades(logToken, ano, interaction.user.id);
             // - debug
             console.log("=-=-=GRADES=-=-=");
             console.log(grades);
@@ -69,8 +69,8 @@ module.exports = {
 
             sGrades += emptyGrades > 0 ? `\n=-=-=-=-\n**${emptyGrades}** *__notas que não foram postadas ainda foram ocultas__*` :
                 `\n=-=-=-=-\n***Total de notas:* __${grades.gradesLenght}__**`;
-            
-            
+
+
             interaction.editReply(sGrades);
         } else {
             console.log('Erro ao fazer login.');

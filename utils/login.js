@@ -1,98 +1,85 @@
-const cheerio = require("cheerio");
 const fs = require("node:fs");
 const path = require('path');
 const usersHome = path.join(__dirname, '..', './users');
 
+async function login(email, password, userId) {
+    let apiToken = "";
+    // Nota: Se userId for undefined, isso cria um caminho com "users/undefined/auth.json"
+    const userToken = path.join(usersHome, `${userId}`, "auth.json");
+    console.log({ userToken })
 
-
-async function getTokens() {
-    const response = await fetch('http://200.145.153.1/nsac', {
-        method: 'GET'
-    });
-
-    const cookies = response.headers.getSetCookie().map((value) => value.split(';')[0]);
-    const html = await response.text();
-    const $ = cheerio.load(html);
-    const hiddenToken = $('input[name="_token"]').val();
-    return [...cookies, hiddenToken];
-}
-
-async function login(email, pass, userId) {
-    let userAuth = {};
-
-    if (userId && fs.existsSync(path.join(usersHome, userId, 'auths', 'auth.json'))) {
-        const auths = path.join(usersHome, userId, 'auths', 'auth.json');
-        console.log("auths found:")
-        console.log(auths)
+    if (userId && fs.existsSync(userToken)) {
+        console.log("auths found:");
+        console.log(userToken);
         console.log("Importing...");
-        const authsContent = await fs.promises.readFile(auths, 'utf-8');
-        userAuth = await JSON.parse(authsContent);
-        const cookieString = userAuth.userAuthString;
-        const responseTest = await fetch("http://200.145.153.1/nsac/home", {
-            "credentials": "include",
-            "headers": {
-                "Cookie": cookieString
-            },
-            "method": "GET",
-            "redirect": "manual"
-        }); // test if server let me log in with these cookies
 
-        console.log(responseTest);
+        try {
+            const storedAuthData = JSON.parse(fs.readFileSync(userToken, 'utf-8'));
 
-        if (responseTest.status == 200) {
-            return cookieString;
-        } else {
-            console.log("Error while login in. Reponse status: " + responseTest.status)
+            const testApiToken = storedAuthData.apiToken;
+
+            const testTokenRequest = await fetch('http://localhost:3000/api/nsac/accounts/token-status', {
+                mode: 'cors',
+                method: 'GET',
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-token": testApiToken,
+                },
+            });
+
+            if (testTokenRequest.ok) {
+                apiToken = testApiToken;
+                return apiToken;
+            }
+        } catch (e) {
+            console.error("Erro ao validar token existente:", e, " ignorando, recriando estrutura");
         }
-
     }
 
-    if (!email || !pass) return false;
-
-    const cookies = await getTokens()
-
-    let xsrf = cookies[0];
-    let nsaconline = cookies[1];
-    let cookiesString = `${xsrf}; ${nsaconline}`;
-    // console.log(cookiesString)
-    const hiddenToken = cookies[2];
-    const emailEncoded = encodeURIComponent(email);
-    const passEncoded = encodeURIComponent(pass);
-    // console.log(email, pass)
-    const authString = `_token=${hiddenToken}&email=${emailEncoded}&password=${passEncoded}`
-
-    // console.log(authString);
-    const responseLogin = await fetch("http://200.145.153.1/nsac/login", {
-        "credentials": "include",
-        "headers": {
-            "Content-Type": "application/x-www-form-urlencoded",
-            "Referer": "http://200.145.153.1/nsac/",
-            "Cookie": cookiesString
+    const devLogin = await fetch("http://localhost:3000/api/auth/login", {
+        mode: 'cors',
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
         },
-        "body": `${authString}&remember=on`,
-        "method": "POST",
-        "redirect": "manual"
+        body: JSON.stringify({
+            email: process.env.NSAC_API_EMAIL,
+            password: process.env.NSAC_API_PASSWORD
+        })
     });
 
-    const newCookies = responseLogin.headers.getSetCookie();
-    xsrf = newCookies[0].split(';')[0];
-    nsaconline = newCookies[1].split(';')[0];
-    const rememberCookie = newCookies[2].split(';')[0];
-    const newCookiesString = `${xsrf}; ${nsaconline}; ${rememberCookie}`;
+    if (!devLogin.ok) throw new Error(`Dev Login falhou: ${devLogin.statusText}`);
 
+    const jwtToken = devLogin.headers.get('authorization');
+    console.log(jwtToken);
 
-    const responseTest = await fetch("http://200.145.153.1/nsac/home", {
-        "credentials": "include",
-        "headers": {
-            "Cookie": newCookiesString
+    if (!jwtToken) throw new Error("Failed to login in API (No Authorization Header).");
+
+    const userAccount = await fetch('http://localhost:3000/api/nsac/accounts', {
+        mode: 'cors',
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": jwtToken
         },
-        "method": "GET",
-        "redirect": "manual"
-    }); // test if server let me log in
+        body: JSON.stringify({
+            email: email,
+            password: password
+        })
+    });
+    const userAccountJson = await userAccount.json();
+    console.log(userAccount)
+    if (!userAccount.ok) throw new Error(`User Login falhou: ${userAccount.statusText}`);
 
-    if (responseLogin.status == 302 && responseTest.status == 200) {
-        return newCookiesString;
-    } else return false;
+
+    apiToken = userAccountJson.data?.apiToken || userAccountJson.apiToken;
+
+    if (!apiToken) {
+        console.error("Resposta da API:", userAccountJson);
+        throw new Error("Failed to get the token!");
+    }
+
+    return apiToken;
 }
 
-module.exports = login
+module.exports = login;

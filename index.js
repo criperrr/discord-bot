@@ -64,7 +64,7 @@ async function initializeGradeChecker(client, usersHome) {
 
     await fsPromises.writeFile(globalGradesPath, globalGradesSJson);
 
-    const checkNewGradesInterval = setInterval(() => checkNewGrades(client), (15 * 15 * 1000));
+    const checkNewGradesInterval = setInterval(() => checkNewGrades(client), (40000));
     console.log("Initial class grade hashes were saved locally");
 }
 
@@ -82,10 +82,17 @@ client.on(Events.InteractionCreate, async interaction => {
     try {
         await command.execute(interaction);
     } catch (error) {
+        console.log(error);
         if (interaction.replied || interaction.deferred) {
-            await interaction.followUp({ content: `There was an error while executing this command!\n debug: ${error}`, flags: MessageFlags.Ephemeral });
+            await interaction.followUp({
+                content: 'Houve um erro ao executar esse comando!',
+                flags: MessageFlags.Ephemeral
+            });
         } else {
-            await interaction.reply({ content: `There was an error while executing this command!\n debug: ${error}`, flags: MessageFlags.Ephemeral });
+            await interaction.reply({
+                content: 'Houve um erro ao executar esse comando!',
+                flags: MessageFlags.Ephemeral
+            });
         }
     }
 })

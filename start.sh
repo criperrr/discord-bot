@@ -1,5 +1,9 @@
 #!/bin/bash
 
+LOG_FOLDER="./logs"
+if [[ ! -d $LOG_FOLDER ]]; then
+    mkdir $LOG_FOLDER
+fi
 LOG_FILES=$(ls ./logs | wc -l)
 
 if [ "$LOG_FILES" -gt 0 ]; then

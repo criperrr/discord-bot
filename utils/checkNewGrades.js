@@ -17,14 +17,15 @@ async function checkNewGrades(client) {
     let lastGradeIndex = 0;
     let differentGrades = [];
     for (id of userIds) {
-        const authPath = path.join(userHome, id, 'auths', 'auth.json');
+        const authPath = path.join(userHome, id, 'auth.json');
+        if(!fs.existsSync(authPath));
         const userAuth = await JSON.parse(fs.readFileSync(authPath));
-        grades = await getGrades(userAuth.userAuthString);
+        grades = await getGrades(userAuth.apiToken);
 
         if (grades) break;
     }
     if(!grades){
-        const auth = await getGrades(process.env.NSACEMAIL, process.env.NSACPASS); // get default user (it will be changeable in future)
+        const auth = await login(process.env.NSACEMAIL, process.env.NSACPASS); // get default user (it will be changeable in future)
         grades = await getGrades(auth);
     }
     if (grades.generalHashes) {
@@ -65,9 +66,9 @@ async function checkNewGrades(client) {
         for (id of userIds) {
             const user = await client.users.fetch(id);
             console.log("iterating for user:" + user.username);
-            const authPath = path.join(userHome, id, 'auths', 'auth.json');
+            const authPath = path.join(userHome, id, 'auth.json');
             const userAuth = await JSON.parse(fs.readFileSync(authPath));
-            grades = await getGrades(userAuth.userAuthString);
+            grades = await getGrades(userAuth.apiToken);
             console.log('grades:')
             console.log(grades);
             let message = `Olá, **${user.username}** :wave:! **Gemilão** aqui!\n\nEstou te avisando que __**saíram novas notas**__ no **NSAC**! :tada:\n\nConfira abaixo as suas notas atualizadas:`;
